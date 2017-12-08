@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.manju23reddy.popularmovies.UI.PopularMoviesMainActivity">
+
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1.5"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
+        android:contentDescription="@string/filter_radio_group"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/colorWhite"
+            android:text="@string/filter_most_popular"
+            android:checked="true"
+            android:id="@+id/rbtn_most_popular"/>
+
+        <RadioButton
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/colorWhite"
+            android:text="@string/filter_top_rated"
+            android:id="@+id/rbtn_top_rated"/>
+
+    </RadioGroup>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dip"
+        android:layout_gravity="center"
+        android:layout_weight="8.5">
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/rcv_movies_list"
+            android:layout_gravity="center"/>
+
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:id="@+id/pbr_download_indicator"/>
+    </FrameLayout>
+
+
+
+</LinearLayout>
