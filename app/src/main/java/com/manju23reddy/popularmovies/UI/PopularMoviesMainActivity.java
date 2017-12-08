@@ -1,16 +1,20 @@
 package com.manju23reddy.popularmovies.UI;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
+import com.manju23reddy.popularmovies.BuildConfig;
 import com.manju23reddy.popularmovies.Model.MovieModel;
 import com.manju23reddy.popularmovies.Model.PopularMovieAdapter;
 import com.manju23reddy.popularmovies.Util.PopularMovieConsts;
@@ -20,18 +24,10 @@ import com.manju23reddy.popularmovies.Util.PopularMovieNetworkUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.net.URL;
 
 public class PopularMoviesMainActivity extends AppCompatActivity implements
         PopularMovieAdapter.MovieThumbnailClickListener, View.OnClickListener {
-
-    private static final String TAG = PopularMoviesMainActivity.class.getSimpleName();
 
     private String API_KEY;
     private static PopularMovieAdapter mMoviesAdapter = null;
@@ -43,7 +39,7 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_popular_movies_main);
 
-        API_KEY = getAPIKey();
+        API_KEY = BuildConfig.API_KEY;
 
         initUI();
 
@@ -80,8 +76,17 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
      * @param filter
      */
     private void loadMovies(String filter){
-        mDownloaderProgressBar.setVisibility(View.VISIBLE);
-        new FetchMovieListTask(this).execute(filter, API_KEY);
+        ConnectivityManager conManager = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = conManager.getActiveNetworkInfo();
+        if (null != activeNetwork && activeNetwork.isConnectedOrConnecting()) {
+            mDownloaderProgressBar.setVisibility(View.VISIBLE);
+            new FetchMovieListTask(this).execute(filter, API_KEY);
+        }
+        else{
+            Toast.makeText(this, getText(R.string.no_internet_error).toString(),
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void downloadComplete(){
@@ -96,7 +101,7 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
     public void onMovieThumbnailClicked(int position) {
         MovieModel selectedThumbnail = mMoviesAdapter.getMovieAtPosition(position);
         Intent movieDetailsScreen = new Intent(this, PopularMoviesDetailedView.class);
-        movieDetailsScreen.putExtra(Intent.EXTRA_TEXT, selectedThumbnail.toString());
+        movieDetailsScreen.putExtra(Intent.EXTRA_TEXT, selectedThumbnail);
         startActivity(movieDetailsScreen);
     }
 
@@ -124,30 +129,6 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
         mMoviesAdapter.addMovie(item);
     }
 
-    /**
-     * Get the API key for themoviedb
-     * @return
-     */
-    private String getAPIKey(){
-        InputStream isStream = getResources().openRawResource(R.raw.credentials);
-        Writer wt = new StringWriter();
-        char [] buffer = new char[1024];
-        try{
-            Reader reader = new BufferedReader(new InputStreamReader(isStream,
-                    "UTF-8"));
-            int n;
-            while ((n = reader.read(buffer))!= -1){
-                wt.write(buffer, 0, n);
-            }
-            isStream.close();
-            JSONObject tempCreds = new JSONObject(wt.toString());
-            return tempCreds.getString(PopularMovieConsts.API_KEY);
-        }
-        catch (Exception ee){
-            Log.e("error", ee.getMessage());
-        }
-        return null;
-    }
 
     /**
      * Async task to perform Network activities

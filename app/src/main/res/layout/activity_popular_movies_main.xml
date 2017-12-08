@@ -38,7 +38,7 @@
     </RadioGroup>
 
     <FrameLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_gravity="center"
         android:layout_weight="8.5">
@@ -54,7 +54,4 @@
             android:layout_gravity="center"
             android:id="@+id/pbr_download_indicator"/>
     </FrameLayout>
-
-
-
 </LinearLayout>

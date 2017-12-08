@@ -1,6 +1,9 @@
 package com.manju23reddy.popularmovies.Model;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.manju23reddy.popularmovies.Util.PopularMovieConsts;
 
 import org.json.JSONObject;
@@ -9,7 +12,7 @@ import org.json.JSONObject;
  * Created by MReddy3 on 12/5/2017.
  */
 
-public class MovieModel {
+public class MovieModel implements Parcelable{
     private int movieId;
     private String moviePosterUrl;
     private String movieTitle;
@@ -28,6 +31,30 @@ public class MovieModel {
         this.moviePlot = plot;
     }
 
+    private MovieModel(Parcel in){
+        this.movieId = in.readInt();
+        this.moviePosterUrl = in.readString();
+        this.movieTitle = in.readString();
+        this.movieReleaseDate = in.readString();
+        this.movieRatings = in.readDouble();
+        this.moviePlot = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(movieId);
+        dest.writeString(moviePosterUrl);
+        dest.writeString(movieTitle);
+        dest.writeString(movieReleaseDate);
+        dest.writeDouble(movieRatings);
+        dest.writeString(moviePlot);
+    }
+
     public MovieModel(final String paracelString){
         try{
             JSONObject parcelJsonObj = new JSONObject(paracelString);
@@ -42,6 +69,24 @@ public class MovieModel {
             ee.printStackTrace();
         }
     }
+
+    public static final Parcelable.Creator<MovieModel> CREATOR =
+            new ClassLoaderCreator<MovieModel>() {
+        @Override
+        public MovieModel createFromParcel(Parcel source, ClassLoader loader) {
+            return new MovieModel(source);
+        }
+
+        @Override
+        public MovieModel createFromParcel(Parcel source) {
+            return new MovieModel(source);
+        }
+
+        @Override
+        public MovieModel[] newArray(int size) {
+            return new MovieModel[size];
+        }
+    };
 
     public int getMovieId(){
         return movieId;
