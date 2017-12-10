@@ -26,7 +26,7 @@ public class PopularMoviesDetailedView extends AppCompatActivity{
 
         setContentView(R.layout.movie_detail_description_layout);
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent inComingIntent = getIntent();
         if (inComingIntent != null && inComingIntent.hasExtra(Intent.EXTRA_TEXT)){
