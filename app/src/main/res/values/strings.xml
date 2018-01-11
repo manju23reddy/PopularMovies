@@ -2,10 +2,17 @@
     <string name="app_name">PopularMovies</string>
     <string name="filter_most_popular">Most Popular</string>
     <string name="filter_top_rated">Top Rated</string>
+    <string name="filter_favorite">Favorites</string>
     <string name="thumbnail_layout">Thumbnail Layout</string>
     <string name="thumbnail_image">Thumbnail Image</string>
     <string name="filter_radio_group">Filter Radio Group</string>
     <string name="movie_detail_description_layout">Movie Detail Description</string>
     <string name="movie_overview_label">Overview</string>
     <string name="no_internet_error">No Internet.</string>
+    <string name="mark_as_favorite">Mark as favorite</string>
+    <string name="movie_trailers">Trailer</string>
+    <string name="movie_reviews">Reviews</string>
+    <string name="no_reviews">No Reviews Available</string>
+    <string name="no_trailers">No Trailers Available</string>
+
 </resources>

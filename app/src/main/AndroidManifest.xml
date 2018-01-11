@@ -17,13 +17,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".UI.PopularMoviesDetailedView"
+        <activity
+            android:name=".UI.PopularMoviesDetailedView"
             android:parentActivityName=".UI.PopularMoviesMainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".UI.PopularMoviesMainActivity"/>
 
         </activity>
+
+        <provider
+            android:name=".Data.FavoriteMovieContentProvider"
+            android:authorities="com.manju23reddy.popularmovies"
+            android:enabled="true"
+            android:exported="true"/>
     </application>
 
 </manifest>

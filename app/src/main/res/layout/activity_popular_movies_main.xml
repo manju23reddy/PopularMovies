@@ -35,6 +35,15 @@
             android:text="@string/filter_top_rated"
             android:id="@+id/rbtn_top_rated"/>
 
+        <RadioButton
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/colorWhite"
+            android:text="@string/filter_favorite"
+            android:id="@+id/rbtn_favorites"/>
+
     </RadioGroup>
 
     <FrameLayout
@@ -49,8 +58,8 @@
             android:layout_gravity="center"/>
 
         <ProgressBar
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="120dip"
+            android:layout_height="120dip"
             android:layout_gravity="center"
             android:id="@+id/pbr_download_indicator"/>
     </FrameLayout>
