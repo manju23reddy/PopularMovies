@@ -232,6 +232,13 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
         }
         catch (Exception ee){
             ee.printStackTrace();
+            if (isMovieFavorite){
+                showSnackBar("Failed to save as favorite.");
+            }
+            else{
+                showSnackBar("Failed to remove from favorite.");
+            }
+
         }
     }
 
