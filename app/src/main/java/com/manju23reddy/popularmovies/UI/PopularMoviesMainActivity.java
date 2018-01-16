@@ -92,24 +92,19 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (null != savedInstanceState){
-            final int scrollPos =  savedInstanceState.getInt(PopularMovieConsts.
+            int scrollPos =  savedInstanceState.getInt(PopularMovieConsts.
                     RECYCLER_LAYOUT_STATE);
 
 
+            GridLayoutManager laytManager = (GridLayoutManager)mThumbnailsRecyclerView.
+                    getLayoutManager();
+            View v = mThumbnailsRecyclerView.getChildAt(scrollPos);
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    GridLayoutManager laytManager = (GridLayoutManager)mThumbnailsRecyclerView.
-                            getLayoutManager();
-                    View v = mThumbnailsRecyclerView.getChildAt(scrollPos);
+            int top = (v == null)? 0 : (v.getTop() -
+                    mThumbnailsRecyclerView.getPaddingTop());
 
-                    int top = (v == null)? 0 : (v.getTop() -
-                            mThumbnailsRecyclerView.getPaddingTop());
+            laytManager.scrollToPositionWithOffset(scrollPos, top);
 
-                    laytManager.scrollToPositionWithOffset(scrollPos, top);
-                }
-            }, 200);
 
         }
     }
