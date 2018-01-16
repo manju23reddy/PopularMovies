@@ -112,6 +112,7 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
         outState.putString(PopularMovieConsts.FLOW, inBundle.getString(PopularMovieConsts.FLOW));
         outState.putString(PopularMovieConsts.SELECTED_MOVIE_DETAILS,
                 inBundle.getString(PopularMovieConsts.SELECTED_MOVIE_DETAILS));
+        outState.putBoolean(PopularMovieConsts.MOVIE_IS_FAVORITE, isMovieFavorite);
 
         if (mTrailersAdapter.getItemCount() > 0) {
             outState.putInt(PopularMovieConsts.TRAILER_RCV_POS,
@@ -140,6 +141,11 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
         super.onRestoreInstanceState(savedInstanceState);
         try {
             if (null != savedInstanceState) {
+                isMovieFavorite = savedInstanceState.getBoolean
+                        (PopularMovieConsts.MOVIE_IS_FAVORITE);
+                if (isMovieFavorite){
+                    setAsFavoriteImgBtn.setImageResource(R.drawable.favorite);
+                }
                 if (savedInstanceState.containsKey(PopularMovieConsts.CONFIG_PERSIST_TRAILERS)) {
 
                     JSONArray trailers = new JSONArray(savedInstanceState.
@@ -165,6 +171,10 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
                         }
                     }, 1000);
 
+                }
+                else{
+                    mTrailersDesc.setText(getResources().getString(R.string.no_trailers));
+                    mTrailersDesc.setVisibility(View.VISIBLE);
                 }
                 if (savedInstanceState.containsKey(PopularMovieConsts.CONFIG_PERSIST_REVIEWS)) {
 
@@ -193,6 +203,11 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
                             }
                         }
                     }, 1000);
+                }
+                else{
+                    mReviewsDesc.setText(getResources().getString(R.string.no_reviews));
+                    mReviewsDesc.setVisibility(View.VISIBLE);
+
                 }
 
 
