@@ -1,10 +1,7 @@
 package com.manju23reddy.popularmovies.UI;
 
-import android.app.LoaderManager;
-import android.content.AsyncTaskLoader;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.Loader;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -28,11 +25,16 @@ import com.manju23reddy.popularmovies.R;
 import com.manju23reddy.popularmovies.Util.PopularMovieConsts;
 import com.manju23reddy.popularmovies.Util.PopularMovieNetworkUtil;
 import com.squareup.picasso.Picasso;
-
+import android.support.design.widget.Snackbar;
+import android.support.design.widget.CoordinatorLayout;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.URL;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 /**
  * Created by MReddy3 on 12/5/2017.
@@ -50,8 +52,25 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
     MovieTrailersAdapter mTrailersAdapter;
     MovieReviewsAdapter mReviewsAdapter;
 
+    @BindView(R.id.txtv_reviews_internet_error)
     TextView mReviewsDesc;
+    @BindView(R.id.txtv_trailers_internet_error)
     TextView mTrailersDesc;
+
+    @BindView(R.id.rcv_movie_trailers)
+    RecyclerView mTrailersRCV;
+    @BindView(R.id.rcv_movie_reviews)
+    RecyclerView mReviewsRCV;
+    @BindView(R.id.imgv_movie_poster)
+    ImageView mMoviePosterImgView;
+    @BindView(R.id.txtv_release_date)
+    TextView movieReleaseDatesTxtView;
+    @BindView(R.id.txtv_movie_rating)
+    TextView movieRating;
+    @BindView(R.id.txtv_movie_plot_details)
+    TextView moviePlot;
+    @BindView(R.id.imgbtn_mark_as_favorite)
+    ImageButton setAsFavoriteImgBtn;
 
     boolean isMovieFavorite;
 
@@ -62,6 +81,8 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.movie_detail_description_layout);
+
+        ButterKnife.bind(this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -98,49 +119,44 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
         getSupportActionBar().setTitle(inSelectedMovie.getMovieTitle());
 
         mMovieId = Integer.toString(inSelectedMovie.getMovieId());
-        ImageView moviePosterImgView = findViewById(R.id.imgv_movie_poster);
-        TextView movieReleaseDatesTxtView = findViewById(R.id.txtv_release_date);
-        TextView movieRating = findViewById(R.id.txtv_movie_rating);
-        TextView moviePlot = findViewById(R.id.txtv_movie_plot_details);
-        ImageButton setAsFavoriteImgBtn = findViewById(R.id.imgbtn_mark_as_favorite);
+
+
         if (isMovieFavorite){
             setAsFavoriteImgBtn.setImageResource(R.drawable.favorite);
         }
         setAsFavoriteImgBtn.setTag(inSelectedMovie);
-        movieRating.setText(""+Double.toString(inSelectedMovie.getMovieRatings()));
+        movieRating.setText(""+Double.toString(inSelectedMovie.getMovieRatings())+" / 10 ");
         movieReleaseDatesTxtView.setText(""+inSelectedMovie.getMovieReleaseDate());
         moviePlot.setText(inSelectedMovie.getMoviePlot());
         if (PopularMovieNetworkUtil.isInternetAvailable(this)) {
             String path = PopularMovieNetworkUtil.POSTER_URL + inSelectedMovie.getMoviePosterUrl();
-            Picasso.with(this).load(path).into(moviePosterImgView);
+            Picasso.with(this).load(path).into(mMoviePosterImgView);
         }
 
         setAsFavoriteImgBtn.setOnClickListener(this);
-
-        mReviewsDesc = findViewById(R.id.txtv_reviews_internet_error);
-        mTrailersDesc = findViewById(R.id.txtv_trailers_internet_error);
 
         //check for internet and get trailers and reviews
         if (PopularMovieNetworkUtil.isInternetAvailable(this)){
             getSupportLoaderManager().restartLoader(MOVIE_DETAILED_LOADER_ID, null,
                     PopularMoviesDetailedView.this);
 
-            RecyclerView trailersRCV = findViewById(R.id.rcv_movie_trailers);
-            RecyclerView reviewsRCV = findViewById(R.id.rcv_movie_reviews);
 
-            LinearLayoutManager trailerLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-            trailersRCV.setLayoutManager(trailerLayoutManager);
 
-            LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-            reviewsRCV.setLayoutManager(reviewLayoutManager);
+            LinearLayoutManager trailerLayoutManager = new LinearLayoutManager
+                    (this, LinearLayoutManager.HORIZONTAL, false);
+            mTrailersRCV.setLayoutManager(trailerLayoutManager);
+
+            LinearLayoutManager reviewLayoutManager = new LinearLayoutManager
+                    (this, LinearLayoutManager.HORIZONTAL, false);
+            mReviewsRCV.setLayoutManager(reviewLayoutManager);
 
             mTrailersAdapter = new MovieTrailersAdapter(this, mPlayTrailerCallBack);
             mReviewsAdapter = new MovieReviewsAdapter(this);
 
-            trailersRCV.setHasFixedSize(true);
-            reviewsRCV.setHasFixedSize(true);
-            trailersRCV.setAdapter(mTrailersAdapter);
-            reviewsRCV.setAdapter(mReviewsAdapter);
+            mTrailersRCV.setHasFixedSize(true);
+            mReviewsRCV.setHasFixedSize(true);
+            mTrailersRCV.setAdapter(mTrailersAdapter);
+            mReviewsRCV.setAdapter(mReviewsAdapter);
         }
         else {
 
@@ -177,14 +193,20 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
                         uri = uri.buildUpon().appendPath(id).build();
 
                         if (getContentResolver().delete(uri, null, null) <= 0) {
-                            Toast.makeText(getBaseContext(), "Failed to delete movie " + curMovie.getMovieId(), Toast.LENGTH_LONG).show();
+                            showSnackBar("Failed to remove movie from " +
+                                    "favorite list ");
+                        }else{
+                            String result_text = curMovie.getMovieTitle()+
+                                    " is removed from your favorite list.";
+                            showSnackBar(result_text);
                         }
 
                     } else {
                         favButton.setImageResource(R.drawable.favorite);
                         isMovieFavorite = true;
                         ContentValues values = new ContentValues();
-                        values.put(FavoriteDBContract.FavoriteMovie.MOVIE_ID, curMovie.getMovieId());
+                        values.put(FavoriteDBContract.FavoriteMovie.MOVIE_ID,
+                                curMovie.getMovieId());
                         values.put(FavoriteDBContract.FavoriteMovie.MOVIE_OVERVIEW,
                                 curMovie.getMoviePlot());
                         values.put(FavoriteDBContract.FavoriteMovie.MOVIE_POSTER_URL,
@@ -199,7 +221,9 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
                         uri = getContentResolver().
                                 insert(FavoriteDBContract.FavoriteMovie.CONTENT_URI, values);
                         if (null != uri) {
-                            //Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
+                            String result_text = curMovie.getMovieTitle()+
+                                    " is added to your favorite list.";
+                            showSnackBar( result_text);
                         }
                     }
                     v.setTag(curMovie);
@@ -280,7 +304,8 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
 
 
     @Override
-    public void onLoadFinished(android.support.v4.content.Loader<JSONObject> loader, JSONObject data) {
+    public void onLoadFinished(android.support.v4.content.Loader<JSONObject> loader,
+                               JSONObject data) {
         try {
             if (null != data) {
                 JSONObject trailers = data.getJSONObject(PopularMovieConsts.MOVIE_TRAILERS);
@@ -334,7 +359,8 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
             try {
                 JSONObject trailer = mTrailersAdapter.getTrailerObject(pos);
                 String key = trailer.getString(PopularMovieConsts.TRAILER_KEY);
-                Intent launchTrailer = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:"+key));
+                Intent launchTrailer = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("vnd.youtube:"+key));
                 startActivity(launchTrailer);
             }
             catch (Exception ee){
@@ -344,5 +370,10 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
         }
     };
 
+    private void showSnackBar(String content){
+        CoordinatorLayout layout = findViewById(R.id.coordinate_layout);
+        Snackbar snackBar = Snackbar.make(layout, content, Snackbar.LENGTH_LONG);
+        snackBar.show();
+    }
 
 }

@@ -57,6 +57,6 @@ public class PopularMovieConsts {
     public final static String TOP_RATED_MOVIES_FLOW =  TOP_RATED_LIST;
     public final static String FAVORITE_MOVIES_FLOW = FAVORITE_MOVIES;
 
-    public final static int NUMBER_OF_FLOWS = 3;
+    public final static String RECYCLER_LAYOUT_STATE = "Recycler_list_state";
 
 }

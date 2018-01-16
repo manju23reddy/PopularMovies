@@ -1,11 +1,10 @@
 package com.manju23reddy.popularmovies.UI;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -31,6 +30,8 @@ import org.json.JSONObject;
 
 import java.net.URL;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 public class PopularMoviesMainActivity extends AppCompatActivity implements
@@ -41,13 +42,19 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
     public static PopularMovieAdapter mMoviesAdapter = null;
     public final int POPULAR_MOVIE_MAIN_LOADER_ID = 100;
     private final int NUMBER_OF_COLUMNS = 4;
-    private ProgressBar mDownloaderProgressBar = null;
+    @BindView(R.id.pbr_download_indicator)
+    ProgressBar mDownloaderProgressBar = null;
     String API_KEY = AppGlobalData.getAppGlobalInstance().getAPIKEY();
+    @BindView(R.id.rcv_movies_list)
+    RecyclerView mThumbnailsRecyclerView;
 
+    @BindView(R.id.rbtn_favorites)
     RadioButton mFilterByFavoritesRdBtn = null;
 
+    @BindView(R.id.rbtn_most_popular)
     RadioButton mFilterByPopularRDBtn = null;
 
+    @BindView(R.id.rbtn_top_rated)
     RadioButton mFilterByRatingRDBtn = null;
 
     @Override
@@ -82,9 +89,34 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (null != savedInstanceState){
+            final int scrollPos =  savedInstanceState.getInt(PopularMovieConsts.
+                    RECYCLER_LAYOUT_STATE);
+
+
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    GridLayoutManager laytManager = (GridLayoutManager)mThumbnailsRecyclerView.
+                            getLayoutManager();
+                    View v = mThumbnailsRecyclerView.getChildAt(scrollPos);
+
+                    int top = (v == null)? 0 : (v.getTop() -
+                            mThumbnailsRecyclerView.getPaddingTop());
+
+                    laytManager.scrollToPositionWithOffset(scrollPos, top);
+                }
+            }, 200);
+
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-
     }
 
     private String getCurrentFlow(){
@@ -103,30 +135,36 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(PopularMovieConsts.FLOW,  getCurrentFlow());
+
+        GridLayoutManager laytManager = (GridLayoutManager)mThumbnailsRecyclerView.
+                getLayoutManager();
+
+        int index = laytManager.findFirstCompletelyVisibleItemPosition();
+
+
+        outState.putInt(PopularMovieConsts.RECYCLER_LAYOUT_STATE,
+                index);
+
     }
 
     /**
      * inti the UI components and set initial states for UI.
      */
     private void initUI(){
-        RecyclerView thumbnailsRecyclerView = findViewById(R.id.rcv_movies_list);
+
+        ButterKnife.bind(this);
 
         GridLayoutManager thumbNailLyt = new GridLayoutManager(this, NUMBER_OF_COLUMNS);
-        thumbnailsRecyclerView.setHasFixedSize(true);
-        thumbnailsRecyclerView.setLayoutManager(thumbNailLyt);
+        mThumbnailsRecyclerView.setHasFixedSize(true);
+        mThumbnailsRecyclerView.setLayoutManager(thumbNailLyt);
 
         mMoviesAdapter = new PopularMovieAdapter(this, this);
-        thumbnailsRecyclerView.setAdapter(mMoviesAdapter);
+        mThumbnailsRecyclerView.setAdapter(mMoviesAdapter);
 
-        mFilterByPopularRDBtn = findViewById(R.id.rbtn_most_popular);
-        mFilterByRatingRDBtn  = findViewById(R.id.rbtn_top_rated);
-        mFilterByFavoritesRdBtn = findViewById(R.id.rbtn_favorites);
 
         mFilterByPopularRDBtn.setOnClickListener(this);
         mFilterByRatingRDBtn.setOnClickListener(this);
         mFilterByFavoritesRdBtn.setOnClickListener(this);
-
-        mDownloaderProgressBar = findViewById(R.id.pbr_download_indicator);
 
         mDownloaderProgressBar.setOnClickListener(this);
 
@@ -332,5 +370,40 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
     @Override
     public void onLoaderReset(Loader<JSONArray> loader) {
         clearAdapter();
+    }
+
+    static class RecyclerViewState extends View.BaseSavedState{
+        public int mScrollPosition;
+
+        RecyclerViewState(Parcel in){
+            super(in);
+            mScrollPosition = in.readInt();
+        }
+
+        RecyclerViewState(Parcelable superState){
+            super(superState);
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeInt(mScrollPosition);
+        }
+
+        public static final Parcelable.Creator<RecyclerViewState> CREATOR = new
+            Parcelable.Creator<RecyclerViewState>(){
+
+                @Override
+                public RecyclerViewState createFromParcel(Parcel source) {
+                    return new RecyclerViewState(source);
+                }
+
+                @Override
+                public RecyclerViewState[] newArray(int size) {
+                    return new RecyclerViewState[size];
+                }
+        };
+
+
     }
 }

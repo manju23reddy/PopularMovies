@@ -42,13 +42,40 @@
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:layout_collapseMode="pin" />
 
-            <ImageButton
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/imgbtn_mark_as_favorite"
-                android:src="@drawable/notfavorite"
-                android:layout_gravity="bottom|end"
-                />
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@color/transperent_back"
+                android:layout_gravity="bottom">
+
+                    <TextView
+                    android:layout_width="0dip"
+                    android:layout_weight="4"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txtv_release_date"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/text_size_medium"
+                    android:layout_margin="@dimen/margin_small"/>
+
+                    <TextView
+                        android:layout_width="0dip"
+                        android:layout_weight="4"
+                        android:textStyle="bold"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtv_movie_rating"
+                        android:textSize="@dimen/text_size_medium"
+                        android:layout_margin="@dimen/margin_small"/>
+
+                    <ImageButton
+                        android:layout_width="0dip"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:id="@+id/imgbtn_mark_as_favorite"
+                        android:src="@drawable/notfavorite"
+                        />
+            </LinearLayout>
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -64,41 +91,17 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dip"
-            android:padding="5dip"
+            android:padding="@dimen/margin_small"
             android:orientation="vertical"
             android:layout_weight="3">
 
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/llyt_movie_details"
-                android:orientation="horizontal">
-
-
-
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_weight="2"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/txtv_release_date"
-                    android:textSize="15sp"
-                    android:layout_margin="5dip"/>
-
-                <TextView
-                    android:layout_width="0dip"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/txtv_movie_rating"
-                    android:textSize="15sp"
-                    android:layout_margin="5dip"/>
-            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dip"
-                android:textSize="17sp"
+                android:layout_margin="@dimen/margin_small"
+                android:textSize="@dimen/text_size_medium"
                 android:textStyle="bold"
                 android:text="@string/movie_overview_label"/>
 
@@ -106,7 +109,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dip"
+                android:layout_margin="@dimen/margin_small"
                 android:id="@+id/txtv_movie_plot_details"/>
 
 
@@ -114,13 +117,13 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dip"
+                android:layout_margin="@dimen/margin_small"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="17sp"
+                    android:textSize="@dimen/text_size_medium"
                     android:textStyle="bold"
                     android:text="@string/movie_trailers"/>
 
@@ -142,13 +145,13 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dip"
+                android:layout_margin="@dimen/margin_small"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="17sp"
+                    android:textSize="@dimen/text_size_medium"
                     android:textStyle="bold"
                     android:text="@string/movie_reviews"/>
 
@@ -168,7 +171,6 @@
             </LinearLayout>
 
         </LinearLayout>
-
 
     </android.support.v4.widget.NestedScrollView>
 

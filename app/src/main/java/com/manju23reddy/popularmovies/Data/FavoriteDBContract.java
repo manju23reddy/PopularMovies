@@ -23,6 +23,8 @@ public class FavoriteDBContract {
         public static final String MOVIE_RELEASE_DATA = PopularMovieConsts.MOVIE_RELEASE_DATE;
         public static final String MOVIE_RATINGS = PopularMovieConsts.MOVIE_RATINGS;
         public static final String MOVIE_OVERVIEW = PopularMovieConsts.MOVIE_OVERVIEW;
+
+        public static final String MOVIE_REVIEWS = PopularMovieConsts.MOVIE_REVIEWS;
     }
 
 }

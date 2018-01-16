@@ -13,6 +13,9 @@ import com.manju23reddy.popularmovies.Util.PopularMovieConsts;
 public class FavoriteDBManager extends SQLiteOpenHelper {
 
 
+    private static final String DATABASE_ALTER_TABLE_ADD_REVIEWS = "ALTER TABLE "+
+            FavoriteDBContract.FavoriteMovie.TABLE_NAME+" ADD COLUMN "+
+            FavoriteDBContract.FavoriteMovie.MOVIE_REVIEWS+ " TEXT ;";
 
     FavoriteDBManager(Context context){
         super(context, PopularMovieConsts.POPULAR_MOVIES_FAVORITE_DB, null,
@@ -35,7 +38,11 @@ public class FavoriteDBManager extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS "+ FavoriteDBContract.FavoriteMovie.TABLE_NAME);
-        onCreate(db);
+        if (oldVersion < 2){
+            //for newer version add reviews column, which can be viewed even when device is in
+            //offline mode.
+            db.execSQL(DATABASE_ALTER_TABLE_ADD_REVIEWS);
+        }
+
     }
 }

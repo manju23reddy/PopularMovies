@@ -2,25 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    android:layout_margin="10dip"
-    android:layout_height="wrap_content"
-    android:background="@color/colorOffWhite">
+    android:layout_margin="@dimen/margin_medium"
+    android:layout_height="200dip"
+    android:background="@color/colorOffWhite"
+    android:elevation="@dimen/elevation_medium">
 
-    <TextView
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="2dip"
-        android:id="@+id/txtv_reviewer_name"
-        android:textSize="17sp"
-        android:textStyle="bold"/>
+        android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/txtv_review_content"
-        android:layout_margin="2dip"
-        android:padding="2dip"
-        />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_extra_small"
+                android:id="@+id/txtv_reviewer_name"
+                android:textSize="@dimen/text_size_medium"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/txtv_review_content"
+                android:layout_margin="@dimen/margin_extra_small"
+                android:padding="@dimen/padding_extra_small"
+                android:scrollbars="vertical"
+                />
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 
 
 </LinearLayout>
