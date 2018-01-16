@@ -1,4 +1,4 @@
-package com.manju23reddy.popularmovies.Model;
+package com.manju23reddy.popularmovies.model;
 
 import com.manju23reddy.popularmovies.BuildConfig;
 

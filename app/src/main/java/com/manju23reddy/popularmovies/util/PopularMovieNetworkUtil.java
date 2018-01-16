@@ -1,4 +1,4 @@
-package com.manju23reddy.popularmovies.Util;
+package com.manju23reddy.popularmovies.util;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -11,11 +11,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-import static com.manju23reddy.popularmovies.Util.PopularMovieConsts.API_KEY;
-import static com.manju23reddy.popularmovies.Util.PopularMovieConsts.MOVIE_REVIEWS;
-import static com.manju23reddy.popularmovies.Util.PopularMovieConsts.MOVIE_TRAILERS;
-import static com.manju23reddy.popularmovies.Util.PopularMovieConsts.POPULAR_LIST;
-import static com.manju23reddy.popularmovies.Util.PopularMovieConsts.TOP_RATED_LIST;
+import static com.manju23reddy.popularmovies.util.PopularMovieConsts.API_KEY;
+import static com.manju23reddy.popularmovies.util.PopularMovieConsts.MOVIE_REVIEWS;
+import static com.manju23reddy.popularmovies.util.PopularMovieConsts.MOVIE_TRAILERS;
+import static com.manju23reddy.popularmovies.util.PopularMovieConsts.POPULAR_LIST;
+import static com.manju23reddy.popularmovies.util.PopularMovieConsts.TOP_RATED_LIST;
 
 /**
  * Network util to handle downloading of movies from http url.

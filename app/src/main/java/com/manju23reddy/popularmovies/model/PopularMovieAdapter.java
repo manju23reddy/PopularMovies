@@ -1,4 +1,4 @@
-package com.manju23reddy.popularmovies.Model;
+package com.manju23reddy.popularmovies.model;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.manju23reddy.popularmovies.R;
-import com.manju23reddy.popularmovies.Util.PopularMovieNetworkUtil;
+import com.manju23reddy.popularmovies.util.PopularMovieNetworkUtil;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -91,5 +91,15 @@ public class PopularMovieAdapter extends RecyclerView.Adapter<PopularMovieAdapte
     public void clearAll(){
         mPopularMoviesList.clear();
         notifyDataSetChanged();
+    }
+
+    public ArrayList<MovieModel>getAllMovies(){
+        return mPopularMoviesList;
+    }
+
+    public void setMovies(ArrayList<MovieModel> allMovies){
+        for(MovieModel curMovie : allMovies){
+            mPopularMoviesList.add(curMovie);
+        }
     }
 }

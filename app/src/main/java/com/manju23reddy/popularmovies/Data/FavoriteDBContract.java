@@ -1,9 +1,8 @@
 package com.manju23reddy.popularmovies.Data;
 
 import android.net.Uri;
-import android.provider.BaseColumns;
 
-import com.manju23reddy.popularmovies.Util.PopularMovieConsts;
+import com.manju23reddy.popularmovies.util.PopularMovieConsts;
 
 /**
  * Created by MReddy3 on 1/4/2018.

@@ -6,22 +6,21 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
-import com.manju23reddy.popularmovies.Util.PopularMovieConsts;
+import com.manju23reddy.popularmovies.util.PopularMovieConsts;
 
 public class FavoriteMovieContentProvider extends ContentProvider {
 
-    FavoriteDBManager mFavDBManager = null;
+    private FavoriteDBManager mFavDBManager = null;
 
-    public static final int ALL_MOVIES = 100;
-    public static final int MOVIE_ID = 101;
+    private static final int ALL_MOVIES = 100;
+    private static final int MOVIE_ID = 101;
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
-    public static UriMatcher buildUriMatcher(){
+    private static UriMatcher buildUriMatcher(){
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
         uriMatcher.addURI(PopularMovieConsts.AUTHORITY, PopularMovieConsts.FAVORITE_MOVIES,

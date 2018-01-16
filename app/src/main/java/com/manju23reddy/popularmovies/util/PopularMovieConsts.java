@@ -1,4 +1,4 @@
-package com.manju23reddy.popularmovies.Util;
+package com.manju23reddy.popularmovies.util;
 
 import android.net.Uri;
 
@@ -6,7 +6,7 @@ import android.net.Uri;
  * Constants used for KEYS value pairs in Intent Extras, JSON Objects or Models.
  */
 
-public class PopularMovieConsts {
+public final class PopularMovieConsts {
     //intent extra key
     public final static String SELECTED_MOVIE_DETAILS = "movie_details";
 
@@ -58,5 +58,15 @@ public class PopularMovieConsts {
     public final static String FAVORITE_MOVIES_FLOW = FAVORITE_MOVIES;
 
     public final static String RECYCLER_LAYOUT_STATE = "Recycler_list_state";
+    public final static String CONFIR_PERSIST = "Config_Persist";
+
+    public final static int NUMBER_OF_FILTERS = 3;
+    public final static int FILTER_POPULAR_LIST = 0;
+    public final static int FILTER_TOP_RATED = 1;
+    public final static int FILTER_FAVORITES = 2;
+
+    private PopularMovieConsts(){
+
+    }
 
 }

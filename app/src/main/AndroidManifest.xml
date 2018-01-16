@@ -11,18 +11,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".UI.PopularMoviesMainActivity">
+        <activity android:name=".ui.PopularMoviesMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".UI.PopularMoviesDetailedView"
-            android:parentActivityName=".UI.PopularMoviesMainActivity">
+            android:name=".ui.PopularMoviesDetailedView"
+            android:parentActivityName=".ui.PopularMoviesMainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".UI.PopularMoviesMainActivity"/>
+                android:value=".ui.PopularMoviesMainActivity"/>
 
         </activity>
 

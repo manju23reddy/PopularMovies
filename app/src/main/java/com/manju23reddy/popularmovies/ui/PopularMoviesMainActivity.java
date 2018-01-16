@@ -1,10 +1,8 @@
-package com.manju23reddy.popularmovies.UI;
+package com.manju23reddy.popularmovies.ui;
 
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Handler;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -18,17 +16,18 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.manju23reddy.popularmovies.Data.FavoriteDBContract;
-import com.manju23reddy.popularmovies.Model.AppGlobalData;
-import com.manju23reddy.popularmovies.Model.MovieModel;
-import com.manju23reddy.popularmovies.Model.PopularMovieAdapter;
-import com.manju23reddy.popularmovies.Util.PopularMovieConsts;
+import com.manju23reddy.popularmovies.model.AppGlobalData;
+import com.manju23reddy.popularmovies.model.MovieModel;
+import com.manju23reddy.popularmovies.model.PopularMovieAdapter;
+import com.manju23reddy.popularmovies.util.PopularMovieConsts;
 import com.manju23reddy.popularmovies.R;
-import com.manju23reddy.popularmovies.Util.PopularMovieNetworkUtil;
+import com.manju23reddy.popularmovies.util.PopularMovieNetworkUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.URL;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,6 +56,7 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
     @BindView(R.id.rbtn_top_rated)
     RadioButton mFilterByRatingRDBtn = null;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,10 +64,9 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
 
         initUI();
 
-        String previous_flow = PopularMovieConsts.POPULAR_LIST;
         if (null != savedInstanceState) {
             if(savedInstanceState.containsKey(PopularMovieConsts.FLOW)){
-                previous_flow = savedInstanceState.getString(PopularMovieConsts.FLOW);
+                String previous_flow = savedInstanceState.getString(PopularMovieConsts.FLOW);
                 if (previous_flow.equalsIgnoreCase(PopularMovieConsts.FAVORITE_MOVIES)){
                     mFilterByPopularRDBtn.setChecked(true);
                 }
@@ -81,29 +80,45 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
 
         }
         else{
-            previous_flow = PopularMovieConsts.POPULAR_LIST;
+            loadMovies(PopularMovieConsts.POPULAR_LIST);
         }
 
-        loadMovies(previous_flow);
+
 
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(final Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+
         if (null != savedInstanceState){
-            int scrollPos =  savedInstanceState.getInt(PopularMovieConsts.
-                    RECYCLER_LAYOUT_STATE);
+
+            if (savedInstanceState.containsKey(PopularMovieConsts.CONFIR_PERSIST)){
+                ArrayList<MovieModel> persistData = savedInstanceState.
+                        getParcelableArrayList(PopularMovieConsts.CONFIR_PERSIST);
+                mMoviesAdapter.setMovies(persistData);
+                mDownloaderProgressBar.setVisibility(View.GONE);
+            }
+            else{
+                loadMovies(savedInstanceState.getString(PopularMovieConsts.FLOW));
+            }
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    final int scrollPos =  savedInstanceState.getInt(PopularMovieConsts.
+                            RECYCLER_LAYOUT_STATE);
+                    GridLayoutManager laytManager = (GridLayoutManager)mThumbnailsRecyclerView.
+                            getLayoutManager();
+                    View v = mThumbnailsRecyclerView.getChildAt(scrollPos);
+
+                    int top = (v == null)? 0 : (v.getTop() -
+                            mThumbnailsRecyclerView.getPaddingTop());
+
+                    laytManager.scrollToPositionWithOffset(scrollPos, top);
+                }
+            }, 1000);
 
 
-            GridLayoutManager laytManager = (GridLayoutManager)mThumbnailsRecyclerView.
-                    getLayoutManager();
-            View v = mThumbnailsRecyclerView.getChildAt(scrollPos);
-
-            int top = (v == null)? 0 : (v.getTop() -
-                    mThumbnailsRecyclerView.getPaddingTop());
-
-            laytManager.scrollToPositionWithOffset(scrollPos, top);
 
 
         }
@@ -139,6 +154,9 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
 
         outState.putInt(PopularMovieConsts.RECYCLER_LAYOUT_STATE,
                 index);
+
+        outState.putParcelableArrayList(PopularMovieConsts.CONFIR_PERSIST,
+                mMoviesAdapter.getAllMovies());
 
     }
 
@@ -258,19 +276,40 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
     @Override
     public Loader<JSONArray> onCreateLoader(int id, final Bundle args) {
         return new AsyncTaskLoader<JSONArray>(this) {
-            JSONArray mCachedData;
-            String previousFlow = new String();
+            JSONArray[] mCachedData = null;
+
+            public int getCurrentFlow(String flow){
+                if (PopularMovieConsts.POPULAR_LIST_FLOW.equalsIgnoreCase(flow)){
+                    return PopularMovieConsts.FILTER_POPULAR_LIST;
+                }
+                else if(PopularMovieConsts.TOP_RATED_MOVIES_FLOW.equalsIgnoreCase(flow)){
+                    return PopularMovieConsts.FILTER_TOP_RATED;
+                }
+                else if (PopularMovieConsts.FAVORITE_MOVIES_FLOW.equalsIgnoreCase(flow)){
+                    return PopularMovieConsts.FILTER_FAVORITES;
+                }
+                else{
+                    throw new UnsupportedOperationException("Not a valid flow");
+                }
+            }
 
             @Override
             protected void onStartLoading() {
 
-                if (previousFlow.equalsIgnoreCase(args.getString(PopularMovieConsts.FLOW))){
-                    deliverResult(mCachedData);
-                }
-                else{
-                    previousFlow = args.getString(PopularMovieConsts.FLOW);
+                if (null == mCachedData){
+                    mCachedData = new JSONArray[PopularMovieConsts.NUMBER_OF_FILTERS];
                     forceLoad();
                 }
+                else{
+                    int flow = getCurrentFlow(args.getString(PopularMovieConsts.FLOW));
+                    if (mCachedData[flow].length() > 0){
+                        deliverResult(mCachedData[flow]);
+                    }
+                    else{
+                        forceLoad();
+                    }
+                }
+
 
             }
 
@@ -338,8 +377,9 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
 
             @Override
             public void deliverResult(JSONArray data) {
-                mCachedData = data;
-                super.deliverResult(data);
+                int flow = getCurrentFlow(args.getString(PopularMovieConsts.FLOW));
+                mCachedData[flow] = data;
+                super.deliverResult(mCachedData[flow]);
             }
         };
 
@@ -350,8 +390,8 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
         if (null != data){
             for (int i = 0; i < data.length(); i++){
                 try {
-
-                    addItemIntoAdapter(new MovieModel(data.getJSONObject(i).toString()));
+                    MovieModel curMovie = new MovieModel(data.getJSONObject(i).toString());
+                    addItemIntoAdapter(curMovie);
                 }
                 catch (Exception ee){
                     ee.printStackTrace();
@@ -365,40 +405,5 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
     @Override
     public void onLoaderReset(Loader<JSONArray> loader) {
         clearAdapter();
-    }
-
-    static class RecyclerViewState extends View.BaseSavedState{
-        public int mScrollPosition;
-
-        RecyclerViewState(Parcel in){
-            super(in);
-            mScrollPosition = in.readInt();
-        }
-
-        RecyclerViewState(Parcelable superState){
-            super(superState);
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            super.writeToParcel(out, flags);
-            out.writeInt(mScrollPosition);
-        }
-
-        public static final Parcelable.Creator<RecyclerViewState> CREATOR = new
-            Parcelable.Creator<RecyclerViewState>(){
-
-                @Override
-                public RecyclerViewState createFromParcel(Parcel source) {
-                    return new RecyclerViewState(source);
-                }
-
-                @Override
-                public RecyclerViewState[] newArray(int size) {
-                    return new RecyclerViewState[size];
-                }
-        };
-
-
     }
 }

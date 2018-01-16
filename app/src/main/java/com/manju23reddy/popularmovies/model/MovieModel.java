@@ -1,10 +1,10 @@
-package com.manju23reddy.popularmovies.Model;
+package com.manju23reddy.popularmovies.model;
 
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.manju23reddy.popularmovies.Util.PopularMovieConsts;
+import com.manju23reddy.popularmovies.util.PopularMovieConsts;
 
 import org.json.JSONObject;
 

@@ -1,4 +1,4 @@
-package com.manju23reddy.popularmovies.UI;
+package com.manju23reddy.popularmovies.ui;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -14,16 +14,15 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.manju23reddy.popularmovies.Data.FavoriteDBContract;
-import com.manju23reddy.popularmovies.Model.AppGlobalData;
-import com.manju23reddy.popularmovies.Model.MovieModel;
-import com.manju23reddy.popularmovies.Model.MovieReviewsAdapter;
-import com.manju23reddy.popularmovies.Model.MovieTrailersAdapter;
+import com.manju23reddy.popularmovies.model.AppGlobalData;
+import com.manju23reddy.popularmovies.model.MovieModel;
+import com.manju23reddy.popularmovies.model.MovieReviewsAdapter;
+import com.manju23reddy.popularmovies.model.MovieTrailersAdapter;
 import com.manju23reddy.popularmovies.R;
-import com.manju23reddy.popularmovies.Util.PopularMovieConsts;
-import com.manju23reddy.popularmovies.Util.PopularMovieNetworkUtil;
+import com.manju23reddy.popularmovies.util.PopularMovieConsts;
+import com.manju23reddy.popularmovies.util.PopularMovieNetworkUtil;
 import com.squareup.picasso.Picasso;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.CoordinatorLayout;
