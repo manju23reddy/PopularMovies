@@ -98,5 +98,9 @@ public class MovieTrailersAdapter  extends RecyclerView.Adapter<MovieTrailersAda
         mMovieTrailers.clear();
     }
 
+    public ArrayList<JSONObject> getAllTrailers(){
+        return mMovieTrailers;
+    }
+
 
 }

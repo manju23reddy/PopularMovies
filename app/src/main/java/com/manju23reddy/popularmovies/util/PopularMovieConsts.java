@@ -58,12 +58,17 @@ public final class PopularMovieConsts {
     public final static String FAVORITE_MOVIES_FLOW = FAVORITE_MOVIES;
 
     public final static String RECYCLER_LAYOUT_STATE = "Recycler_list_state";
-    public final static String CONFIR_PERSIST = "Config_Persist";
+    public final static String CONFIG_PERSIST = "Config_Persist";
 
     public final static int NUMBER_OF_FILTERS = 3;
     public final static int FILTER_POPULAR_LIST = 0;
     public final static int FILTER_TOP_RATED = 1;
     public final static int FILTER_FAVORITES = 2;
+
+    public final static String TRAILER_RCV_POS = "TRAILER_RCV_POS";
+    public final static String REVIEWERS_RCV_POS = "REVIEWERS_RCV_POS";
+    public final static String CONFIG_PERSIST_TRAILERS = "Config_Persist_Trailers";
+    public final static String CONFIG_PERSIST_REVIEWS = "Config_Persist_reviews";
 
     private PopularMovieConsts(){
 

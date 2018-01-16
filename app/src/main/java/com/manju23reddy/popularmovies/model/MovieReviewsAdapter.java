@@ -88,4 +88,8 @@ public class MovieReviewsAdapter extends RecyclerView.Adapter<MovieReviewsAdapte
         mMovieReviews.clear();
     }
 
+    public ArrayList<JSONObject> getAllReviews(){
+        return mMovieReviews;
+    }
+
 }

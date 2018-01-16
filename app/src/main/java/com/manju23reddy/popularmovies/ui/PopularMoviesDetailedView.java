@@ -4,11 +4,14 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -30,6 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.URL;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -87,6 +91,7 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
 
         if(null != savedInstanceState){
             inBundle = savedInstanceState;
+            initUIViews(inBundle);
         }
         else {
             Intent inComingIntent = getIntent();
@@ -94,9 +99,11 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
                 inBundle = inComingIntent.getParcelableExtra(Intent.EXTRA_TEXT);
 
             }
+            initUIViews(inBundle);
+            getTrailersAndReviews();
         }
 
-        initUIViews(inBundle);
+
     }
 
     @Override
@@ -105,6 +112,95 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
         outState.putString(PopularMovieConsts.FLOW, inBundle.getString(PopularMovieConsts.FLOW));
         outState.putString(PopularMovieConsts.SELECTED_MOVIE_DETAILS,
                 inBundle.getString(PopularMovieConsts.SELECTED_MOVIE_DETAILS));
+
+        if (mTrailersAdapter.getItemCount() > 0) {
+            outState.putInt(PopularMovieConsts.TRAILER_RCV_POS,
+                    ((LinearLayoutManager) mTrailersRCV.getLayoutManager()).
+                            findFirstCompletelyVisibleItemPosition());
+
+            ArrayList<JSONObject>trailers  = mTrailersAdapter.getAllTrailers();
+            outState.putString(PopularMovieConsts.CONFIG_PERSIST_TRAILERS, trailers.toString());
+        }
+
+        if (mReviewsAdapter.getItemCount() > 0 ) {
+            outState.putInt(PopularMovieConsts.REVIEWERS_RCV_POS,
+                    ((LinearLayoutManager) mReviewsRCV.getLayoutManager()).
+                            findFirstCompletelyVisibleItemPosition());
+            ArrayList<JSONObject>reviewes = mReviewsAdapter.getAllReviews();
+            outState.putString(PopularMovieConsts.CONFIG_PERSIST_REVIEWS, reviewes.toString());
+        }
+
+
+
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(final Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        try {
+            if (null != savedInstanceState) {
+                if (savedInstanceState.containsKey(PopularMovieConsts.CONFIG_PERSIST_TRAILERS)) {
+
+                    JSONArray trailers = new JSONArray(savedInstanceState.
+                            getString(PopularMovieConsts.CONFIG_PERSIST_TRAILERS));
+                    addMovieTrailersToAdapter(trailers);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (savedInstanceState.containsKey(PopularMovieConsts.
+                                    TRAILER_RCV_POS)) {
+                                int trailers_pos = savedInstanceState.
+                                        getInt(PopularMovieConsts.TRAILER_RCV_POS);
+                                View trailerView = mTrailersRCV.getChildAt(trailers_pos);
+
+                                int trailerLeft = (trailerView == null) ? 0 :
+                                        (trailerView.getLeft() -
+                                                mTrailersRCV.getPaddingLeft());
+
+
+                                ((LinearLayoutManager) mTrailersRCV.getLayoutManager()).
+                                        scrollToPositionWithOffset(trailers_pos, trailerLeft);
+                            }
+                        }
+                    }, 1000);
+
+                }
+                if (savedInstanceState.containsKey(PopularMovieConsts.CONFIG_PERSIST_REVIEWS)) {
+
+                    JSONArray reviews = new JSONArray(savedInstanceState.getString
+                            (PopularMovieConsts.CONFIG_PERSIST_REVIEWS));
+
+                    addMovieReviewsToAdapter(reviews);
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (savedInstanceState.containsKey(PopularMovieConsts.
+                                    REVIEWERS_RCV_POS)){
+                                int reviews_pos = savedInstanceState.
+                                        getInt(PopularMovieConsts.REVIEWERS_RCV_POS);
+
+                                View reviewerView = mReviewsRCV.getChildAt(reviews_pos);
+
+                                int reviwerLeft = (reviewerView == null)? 0 :
+                                        (reviewerView.getLeft() -
+                                                mReviewsRCV.getPaddingLeft());
+
+
+                                ((LinearLayoutManager)mReviewsRCV.getLayoutManager()).
+                                        scrollToPositionWithOffset(reviews_pos, reviwerLeft);
+                            }
+                        }
+                    }, 1000);
+                }
+
+
+            }
+        }
+        catch (Exception ee){
+            ee.printStackTrace();
+        }
     }
 
     private void initUIViews(Bundle inData){
@@ -134,28 +230,30 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
 
         setAsFavoriteImgBtn.setOnClickListener(this);
 
+        LinearLayoutManager trailerLayoutManager = new LinearLayoutManager
+                (this, LinearLayoutManager.HORIZONTAL, false);
+        mTrailersRCV.setLayoutManager(trailerLayoutManager);
+
+        LinearLayoutManager reviewLayoutManager = new LinearLayoutManager
+                (this, LinearLayoutManager.HORIZONTAL, false);
+        mReviewsRCV.setLayoutManager(reviewLayoutManager);
+
+        mTrailersAdapter = new MovieTrailersAdapter(this, mPlayTrailerCallBack);
+        mReviewsAdapter = new MovieReviewsAdapter(this);
+
+        mTrailersRCV.setHasFixedSize(true);
+        mReviewsRCV.setHasFixedSize(true);
+        mTrailersRCV.setAdapter(mTrailersAdapter);
+        mReviewsRCV.setAdapter(mReviewsAdapter);
+
+    }
+
+    public void getTrailersAndReviews(){
         //check for internet and get trailers and reviews
         if (PopularMovieNetworkUtil.isInternetAvailable(this)){
+
             getSupportLoaderManager().restartLoader(MOVIE_DETAILED_LOADER_ID, null,
                     PopularMoviesDetailedView.this);
-
-
-
-            LinearLayoutManager trailerLayoutManager = new LinearLayoutManager
-                    (this, LinearLayoutManager.HORIZONTAL, false);
-            mTrailersRCV.setLayoutManager(trailerLayoutManager);
-
-            LinearLayoutManager reviewLayoutManager = new LinearLayoutManager
-                    (this, LinearLayoutManager.HORIZONTAL, false);
-            mReviewsRCV.setLayoutManager(reviewLayoutManager);
-
-            mTrailersAdapter = new MovieTrailersAdapter(this, mPlayTrailerCallBack);
-            mReviewsAdapter = new MovieReviewsAdapter(this);
-
-            mTrailersRCV.setHasFixedSize(true);
-            mReviewsRCV.setHasFixedSize(true);
-            mTrailersRCV.setAdapter(mTrailersAdapter);
-            mReviewsRCV.setAdapter(mReviewsAdapter);
         }
         else {
 
@@ -320,26 +418,44 @@ public class PopularMoviesDetailedView extends AppCompatActivity implements View
                 JSONArray trailerResult = trailers.getJSONArray(PopularMovieConsts.RESULT);
                 JSONArray reviewsResult = reviews.getJSONArray(PopularMovieConsts.RESULT);
 
-                int numTrailers = trailerResult.length();
-                if(numTrailers <= 0){
-                    mTrailersDesc.setText(getResources().getString(R.string.no_trailers));
-                    mTrailersDesc.setVisibility(View.VISIBLE);
-                }
-                else {
-                    for (int i = 0; i < numTrailers ; i++) {
-                        mTrailersAdapter.addTrailer(trailerResult.getJSONObject(i));
-                    }
-                }
+                addMovieTrailersToAdapter(trailerResult);
+                addMovieReviewsToAdapter(reviewsResult);
 
-                int numReviews = reviewsResult.length();
-                if (numReviews <= 0){
-                    mReviewsDesc.setText(getResources().getString(R.string.no_reviews));
-                    mReviewsDesc.setVisibility(View.VISIBLE);
+            }
+        }
+        catch (Exception ee){
+            ee.printStackTrace();
+        }
+    }
+
+    public void addMovieTrailersToAdapter(JSONArray trailerResult){
+        try {
+            int numTrailers = trailerResult.length();
+            if (numTrailers <= 0) {
+                mTrailersDesc.setText(getResources().getString(R.string.no_trailers));
+                mTrailersDesc.setVisibility(View.VISIBLE);
+            } else {
+                mTrailersAdapter.resetAdapter();
+                for (int i = 0; i < numTrailers; i++) {
+                    mTrailersAdapter.addTrailer(trailerResult.getJSONObject(i));
                 }
-                else {
-                    for (int i = 0; i < numReviews; i++) {
-                        mReviewsAdapter.addReviews(reviewsResult.getJSONObject(i));
-                    }
+            }
+        }
+        catch (Exception ee){
+            ee.printStackTrace();
+        }
+    }
+
+    public void addMovieReviewsToAdapter(JSONArray reviewsResult){
+        try {
+            int numReviews = reviewsResult.length();
+            if (numReviews <= 0) {
+                mReviewsDesc.setText(getResources().getString(R.string.no_reviews));
+                mReviewsDesc.setVisibility(View.VISIBLE);
+            } else {
+                mReviewsAdapter.resetAdapater();
+                for (int i = 0; i < numReviews; i++) {
+                    mReviewsAdapter.addReviews(reviewsResult.getJSONObject(i));
                 }
             }
         }

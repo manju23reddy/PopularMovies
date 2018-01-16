@@ -93,9 +93,9 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
 
         if (null != savedInstanceState){
 
-            if (savedInstanceState.containsKey(PopularMovieConsts.CONFIR_PERSIST)){
+            if (savedInstanceState.containsKey(PopularMovieConsts.CONFIG_PERSIST)){
                 ArrayList<MovieModel> persistData = savedInstanceState.
-                        getParcelableArrayList(PopularMovieConsts.CONFIR_PERSIST);
+                        getParcelableArrayList(PopularMovieConsts.CONFIG_PERSIST);
                 mMoviesAdapter.setMovies(persistData);
                 mDownloaderProgressBar.setVisibility(View.GONE);
             }
@@ -118,15 +118,18 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
                 }
             }, 1000);
 
-
-
-
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (getCurrentFlow().equalsIgnoreCase(PopularMovieConsts.FAVORITE_MOVIES_FLOW)){
+            mMoviesAdapter.clearAll();
+            Bundle args = new Bundle();
+            args.putString(PopularMovieConsts.FLOW, PopularMovieConsts.FAVORITE_MOVIES);
+            startLoader(args);
+        }
     }
 
     private String getCurrentFlow(){
@@ -155,7 +158,7 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
         outState.putInt(PopularMovieConsts.RECYCLER_LAYOUT_STATE,
                 index);
 
-        outState.putParcelableArrayList(PopularMovieConsts.CONFIR_PERSIST,
+        outState.putParcelableArrayList(PopularMovieConsts.CONFIG_PERSIST,
                 mMoviesAdapter.getAllMovies());
 
     }
@@ -203,6 +206,8 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
             } else {
                 Toast.makeText(this, getText(R.string.no_internet_error).toString(),
                         Toast.LENGTH_LONG).show();
+                mDownloaderProgressBar.setVisibility(View.GONE);
+                return;
             }
         }
         else if(filter.equalsIgnoreCase(PopularMovieConsts.FAVORITE_MOVIES)){
@@ -215,6 +220,12 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
             //do nothing
             return;
         }
+        startLoader(args);
+
+
+    }
+
+    public void startLoader(Bundle args){
         LoaderManager loaderManager = getSupportLoaderManager();
         Loader<String> moviesLoader = loaderManager.getLoader(POPULAR_MOVIE_MAIN_LOADER_ID);
         if (null == moviesLoader) {
@@ -223,8 +234,9 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
         else {
             loaderManager.restartLoader(POPULAR_MOVIE_MAIN_LOADER_ID, args, this);
         }
-
     }
+
+
 
     private void downloadComplete(){
         mDownloaderProgressBar.setVisibility(View.GONE);
@@ -302,7 +314,7 @@ public class PopularMoviesMainActivity extends AppCompatActivity implements
                 }
                 else{
                     int flow = getCurrentFlow(args.getString(PopularMovieConsts.FLOW));
-                    if (mCachedData[flow].length() > 0){
+                    if ( flow != PopularMovieConsts.FILTER_FAVORITES && mCachedData[flow].length() > 0){
                         deliverResult(mCachedData[flow]);
                     }
                     else{
